@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const status = document.getElementById('status');
+  const errorDiv = document.getElementById('error');
   const toast = document.getElementById('toast');
   const iosInstructions = document.getElementById('ios-instructions');
   const urlInput = document.getElementById('urlInput');
@@ -19,6 +20,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
   }
 
+  // Show error message
+  function showError(message) {
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+  }
+
+  // Clear error message
+  function clearError() {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+
   // Validate URL
   function isValidUrl(string) {
     try {
@@ -29,49 +42,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Check clipboard permission (where supported)
+  async function checkClipboardPermission() {
+    if ('permissions' in navigator && 'query' in navigator.permissions) {
+      try {
+        const permissionStatus = await navigator.permissions.query({ name: 'clipboard-write' });
+        console.log('Clipboard permission status:', permissionStatus.state);
+        return permissionStatus.state === 'granted' || permissionStatus.state === 'prompt';
+      } catch (err) {
+        console.warn('Clipboard permission check failed:', err);
+        return true; // Assume permission might be granted (fallback for unsupported browsers)
+      }
+    }
+    return true; // Fallback for browsers that don’t support the Permissions API (e.g., Safari)
+  }
+
   // Handle shared URL
   async function handleSharedUrl(url) {
     try {
-      // Log the raw URL for debugging
+      // Clear any previous errors
+      clearError();
+
       console.log('Received URL:', url);
 
-      // Add https:// if no protocol is specified
+      // Check if the input looks like a URL; if not, treat it as invalid
+      if (!url.includes('.')) {
+        throw new Error('Input does not appear to be a URL. Please share a valid webpage URL.');
+      }
+
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = `https://${url}`;
       }
 
-      // Validate the URL
       if (!isValidUrl(url)) {
-        throw new Error('Invalid URL format');
+        throw new Error('Invalid URL format. Please ensure the URL is correct (e.g., https://example.com).');
       }
 
       status.textContent = `Processing ${url}...`;
 
-      // Append the URL to archive.is/newest/
       const archiveUrl = `http://archive.is/newest/${encodeURIComponent(url)}`;
       console.log('Constructed archive URL:', archiveUrl);
 
       // Copy the archive URL to clipboard
       let clipboardSuccess = false;
-      try {
-        await navigator.clipboard.writeText(archiveUrl);
-        console.log('Clipboard write successful');
-        clipboardSuccess = true;
-      } catch (clipboardErr) {
-        console.warn('Clipboard write failed:', clipboardErr);
-        // Fallback: Use execCommand for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = archiveUrl;
-        document.body.appendChild(textarea);
-        textarea.select();
+      const canWriteToClipboard = await checkClipboardPermission();
+      if (canWriteToClipboard) {
         try {
-          document.execCommand('copy');
-          console.log('Fallback clipboard write successful');
+          await navigator.clipboard.writeText(archiveUrl);
+          console.log('Clipboard write successful');
           clipboardSuccess = true;
-        } catch (fallbackErr) {
-          console.error('Fallback clipboard write failed:', fallbackErr);
+        } catch (clipboardErr) {
+          console.warn('Clipboard write failed:', clipboardErr);
+          // Fallback: Use execCommand for older browsers
+          const textarea = document.createElement('textarea');
+          textarea.value = archiveUrl;
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand('copy');
+            console.log('Fallback clipboard write successful');
+            clipboardSuccess = true;
+          } catch (fallbackErr) {
+            console.error('Fallback clipboard write failed:', fallbackErr);
+          }
+          document.body.removeChild(textarea);
         }
-        document.body.removeChild(textarea);
+      } else {
+        console.warn('Clipboard permission denied');
       }
 
       // Open the archive URL in a new tab
@@ -90,11 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (clipboardSuccess) {
         showToast();
       } else {
-        status.textContent += ' (Failed to copy the link)';
+        showError('Failed to copy the link to clipboard. You can manually copy it from the URL above.');
       }
     } catch (err) {
       console.error('Error in handleSharedUrl:', err);
-      status.textContent = `Error: ${err.message}. Please try again.`;
+      showError(err.message);
     }
   }
 
@@ -105,7 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('Shared URL:', sharedUrl);
 
   if (sharedUrl) {
-    handleSharedUrl(sharedUrl);
+    const cleanedUrl = sharedUrl.trim();
+    if (cleanedUrl) {
+      handleSharedUrl(cleanedUrl);
+    } else {
+      showError('No valid URL shared. Please try sharing a webpage again.');
+    }
   } else if (isIOS) {
     iosInstructions.classList.remove('hidden');
   } else {
@@ -118,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (url) {
       handleSharedUrl(url);
     } else {
-      status.textContent = 'Please enter a valid URL.';
+      showError('Please enter a valid URL.');
     }
   });
 
@@ -137,10 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } catch (err) {
           console.error('Share failed:', err);
-          status.textContent = 'Share cancelled or failed. Please paste the URL manually.';
+          showError('Share cancelled or failed. Please paste the URL manually.');
         }
       } else {
-        status.textContent = 'Web Share API not supported. Please paste the URL manually.';
+        showError('Web Share API not supported. Please paste the URL manually.');
       }
     });
   }
