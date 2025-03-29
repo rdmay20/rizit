@@ -32,6 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle shared URL
   async function handleSharedUrl(url) {
     try {
+      // Log the raw URL for debugging
+      console.log('Received URL:', url);
+
+      // Add https:// if no protocol is specified
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = `https://${url}`;
+      }
+
       // Validate the URL
       if (!isValidUrl(url)) {
         throw new Error('Invalid URL format');
@@ -44,21 +52,46 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Constructed archive URL:', archiveUrl);
 
       // Copy the archive URL to clipboard
+      let clipboardSuccess = false;
       try {
         await navigator.clipboard.writeText(archiveUrl);
         console.log('Clipboard write successful');
+        clipboardSuccess = true;
       } catch (clipboardErr) {
-        throw new Error(`Clipboard error: ${clipboardErr.message}`);
+        console.warn('Clipboard write failed:', clipboardErr);
+        // Fallback: Use execCommand for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = archiveUrl;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          console.log('Fallback clipboard write successful');
+          clipboardSuccess = true;
+        } catch (fallbackErr) {
+          console.error('Fallback clipboard write failed:', fallbackErr);
+        }
+        document.body.removeChild(textarea);
       }
 
       // Open the archive URL in a new tab
       const newTab = window.open(archiveUrl, '_blank');
       if (!newTab) {
-        throw new Error('Failed to open new tab. Please allow popups for this site.');
+        status.textContent = 'Popup blocked. Click here to open: ';
+        const link = document.createElement('a');
+        link.href = archiveUrl;
+        link.textContent = archiveUrl;
+        link.target = '_blank';
+        status.appendChild(link);
+      } else {
+        status.textContent = 'Opening archive.is with your URL...';
       }
 
-      status.textContent = 'Opening archive.is with your URL...';
-      showToast();
+      if (clipboardSuccess) {
+        showToast();
+      } else {
+        status.textContent += ' (Failed to copy the link)';
+      }
     } catch (err) {
       console.error('Error in handleSharedUrl:', err);
       status.textContent = `Error: ${err.message}. Please try again.`;
@@ -68,11 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check if URL was shared via Web Share Target (works on Android)
   const urlParams = new URLSearchParams(window.location.search);
   const sharedUrl = urlParams.get('url') || urlParams.get('text');
+  console.log('URL params:', urlParams.toString());
+  console.log('Shared URL:', sharedUrl);
 
   if (sharedUrl) {
     handleSharedUrl(sharedUrl);
   } else if (isIOS) {
     iosInstructions.classList.remove('hidden');
+  } else {
+    status.textContent = 'Please share a webpage with Rizive using the share menu.';
   }
 
   // Handle manual URL submission
