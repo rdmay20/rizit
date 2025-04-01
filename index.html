@@ -6,16 +6,16 @@
   <title>rizit</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
-  <meta name="apple-mobile-web-app-capable"="yes">
-  <meta name="apple-mobile-web-app-status-bar-style"="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
 </head>
 <body>
   <div class="container">
-    <h1>rizit - v2.0</h1>
+    <h1>rizit</h1>
     
     <!-- App Description -->
-    <div class="app-summary">
-      <p>Rizit quickly checks if a webpage has been archived and automatically loads the saved version. Perfect for accessing content that's no longer available.</p>
+    <div class="instructions">
+      <p>Rizit quickly checks if a webpage has been archived and automatically loads the saved version in a new tab.</p>
     </div>
 
     <!-- Main Instructions -->
@@ -41,12 +41,24 @@
     
     <!-- iOS specific instructions -->
     <div id="ios-instructions" class="hidden">
-      <p><strong>iOS Users:</strong> Tap the button below to share a webpage with rizit:</p>
-      <button id="sharePrompt">Share a Webpage</button>
-      <p>Or paste the URL manually:</p>
+      <p><strong>iOS Users:</strong> Sadly Apple doesn’t allow progressive web apps to appear on the share list.</p>
+      <p>Please paste the URL manually:</p>
       <input type="text" id="urlInput" placeholder="Paste URL here">
       <button id="submitUrl">Submit</button>
     </div>
+
+    <!-- Desktop specific instructions -->
+<div id="desktop-instructions" class="hidden">
+  <p><strong>Desktop Users:</strong> Rizit works best on mobile devices, but you can still use it on your desktop browser.</p>
+  <p>To use Rizit on your desktop:</p>
+  <ol>
+    <li>Copy the URL of the webpage you want to archive.</li>
+    <li>Paste the URL into the input field below.</li>
+    <li>Click the "Submit" button to load the archived version.</li>
+  </ol>
+  <input type="text" id="desktopUrlInput" placeholder="Paste URL here">
+  <button id="desktopSubmitUrl">Submit</button>
+</div>
     
     <div id="toast" class="toast hidden">Link has been copied to your clipboard</div>
   </div>

@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlInput = document.getElementById('urlInput');
   const submitUrl = document.getElementById('submitUrl');
   const sharePrompt = document.getElementById('sharePrompt');
+  const desktopInstructions = document.getElementById('desktop-instructions');
+  const isDesktop = window.innerWidth > 768; // Adjust width as needed for desktop detection
+  if (isDesktop) {
+    desktopInstructions.classList.remove('hidden');
+  }
 
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -153,6 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     status.textContent = 'Please share a webpage with rizit using the share menu.';
   }
+
+    // Handle manual URL submission for desktop
+    desktopSubmitUrl.addEventListener('click', () => {
+      const url = desktopUrlInput.value.trim();
+      if (url) {
+        handleSharedUrl(url);
+      } else {
+        showError('Please enter a valid URL.');
+      }
+    });
 
   // Handle manual URL submission
   submitUrl.addEventListener('click', () => {
