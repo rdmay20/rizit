@@ -3,24 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rizive</title>
+  <title>rizit</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable"="yes">
+  <meta name="apple-mobile-web-app-status-bar-style"="black">
 </head>
 <body>
   <div class="container">
-    <h1>Rizive - v2.0</h1>
-    <p id="status">Share a webpage with Rizive to get started!</p>
+    <h1>rizit - v2.0</h1>
+    
+    <!-- App Description -->
+    <div class="app-summary">
+      <p>Rizit quickly checks if a webpage has been archived and automatically loads the saved version. Perfect for accessing content that's no longer available.</p>
+    </div>
+
+    <!-- Main Instructions -->
+    <div class="instructions">
+      <h2>How to Get Started</h2>
+      <ol class="setup-steps">
+        <li>Open Chrome browser on your Android device</li>
+        <li>Tap the menu (⋮) and select "Install app" or "Add to home screen"</li>
+        <li>Once installed, you can start using Rizit!</li>
+      </ol>
+
+      <h3>Using Rizit</h3>
+      <ol class="usage-steps">
+        <li>Browse to any webpage using your preferred browser</li>
+        <li>Tap the Share button</li>
+        <li>Select "Rizit" from the share menu</li>
+        <li>The archived version will load automatically</li>
+      </ol>
+    </div>
+
+    <p id="status">Share a webpage with Rizit to get started!</p>
     <div id="error" class="error hidden"></div>
+    
+    <!-- iOS specific instructions -->
     <div id="ios-instructions" class="hidden">
-      <p><strong>iOS Users:</strong> Tap the button below to share a webpage with Rizive:</p>
+      <p><strong>iOS Users:</strong> Tap the button below to share a webpage with rizit:</p>
       <button id="sharePrompt">Share a Webpage</button>
       <p>Or paste the URL manually:</p>
       <input type="text" id="urlInput" placeholder="Paste URL here">
       <button id="submitUrl">Submit</button>
     </div>
+    
     <div id="toast" class="toast hidden">Link has been copied to your clipboard</div>
   </div>
   <script src="app.js"></script>

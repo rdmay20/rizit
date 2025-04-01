@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (isIOS) {
     iosInstructions.classList.remove('hidden');
   } else {
-    status.textContent = 'Please share a webpage with Rizive using the share menu.';
+    status.textContent = 'Please share a webpage with rizit using the share menu.';
   }
 
   // Handle manual URL submission
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (navigator.share) {
         try {
           const shareData = await navigator.share({
-            title: 'Share a webpage with Rizive',
+            title: 'Share a webpage with rizit',
             text: 'Please share the URL of the webpage you want to archive.'
           });
           const url = shareData.url || shareData.text;

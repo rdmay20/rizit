@@ -1,6 +1,6 @@
 // Use a versioned cache name to ensure updates are reflected
-const CACHE_VERSION = 'v2'; // Increment this version when you make changes
-const CACHE_NAME = `rizive-cache-${CACHE_VERSION}`;
+const CACHE_VERSION = 'v3'; // Increment this version when you make changes
+const CACHE_NAME = `rizit-cache-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
   '/index.html',
