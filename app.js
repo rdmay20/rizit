@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle shared URL
   async function handleSharedUrl(url) {
+    url = url.split("?")[0];
     try {
       // Clear any previous errors
       clearError();
